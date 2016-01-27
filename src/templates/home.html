@@ -1,0 +1,7 @@
+<h1>Hello again</h1>
+<h2>{{ template_title }}</h2>
+<h2>{{ template_title1 }}</h2>
+<form method = "POST" action="">{% csrf_token %}
+	{{ form.as_p }}
+	<input type="submit" value="Sign up"/>
+</form>

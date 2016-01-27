@@ -1,0 +1,309 @@
+1) Creating new project
+
+django-admin startproject trydjango18 .
+
+python manage.py runserver 			// starts server, check in browser at  http://127.0.0.1:8000/
+
+python manage.py migrate			// creates admin db and other files
+
+python manage.py createsuperuser		// creates superuser for admin site 
+
+python manage.py runserver			// check at http://127.0.0.1:8000/admin/
+
+python manage.py startapp newsletter		// creates a new app named newsletter
+
+2) View and url
+// newsletter/views.py
+def home(request):
+	return render(request, "home.html", {})
+
+// trydjango18/urls.py urlpatterns
+url(r'^$', 'newsletter.views.home', name='home') 
+
+3) Settings are all inside settings.py file.
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'newsletter'
+)
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+
+4) create a directory named 'templates' inside 'newsletter'
+   create a file home.html inside  templates.
+
+another way to setup templates.
+   create a directory 'templates' in the root directory where manage.py is there.
+   In settings.py 
+  	TEMPLATES = [
+    {
+        'DIRS': [os.path.join(BASE_DIR, "templates")],
+    }
+
+or
+ 'DIRS': [os.path.join(BASE_DIR, "templates"), "/home/toktok/programming/python_programming/trydjangotut/src/abctemplates"],
+
+5)models.py
+class SignUp(models.Model):
+	email = models.EmailField()
+	full_name = models.CharField(max_length=120,blank=True,null=True)
+	timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
+	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+	def __str__(self):  #__unicode__ 2.6 or 3.2
+		return self.email
+
+// make sure settings.py has 'newsletter' added in Installed apps 
+
+python manage.py makemigrations			// Initializes the migration to db
+python manage.py migrate			// applies the migration
+
+
+6) Adding the database in admin console admin.py
+
+from .models import SignUp
+admin.site.register(SignUp)
+
+7) To display more options for admin
+admin.py
+
+class SignUpAdmin(admin.ModelAdmin):
+	list_display = ["__str__", "timestamp", "updated"]
+	class Meta:
+		model = SignUp
+admin.site.register(SignUp, SignUpAdmin)
+
+//More info 
+https://docs.djangoproject.com/en/1.9/ref/contrib/admin/
+
+8) Model form
+
+//create a file forms.py inside 'newsletter'
+from django import forms
+from .models import SignUp
+
+class SignUpForm(forms.ModelForm):
+	class Meta:
+		model = SignUp
+		fields = ['full_name', 'email']
+		#exclude = ['full_name']				#Avoid using exclude
+
+// In admin.py 
+from .forms import SignUpForm
+from .models import SignUp
+
+class SignUpAdmin(admin.ModelAdmin):
+	list_display = ["__str__", "timestamp", "updated"]
+	form = SignUpForm
+	# class Meta:
+	# 	model = SignUp
+admin.site.register(SignUp, SignUpAdmin)
+
+9) Custom validation
+
+// forms.py
+class SignUpForm(forms.ModelForm):
+
+	def clean_email(self):
+		print(self.cleaned_data)
+		return "abc@mail.com"
+		
+9.1)
+def clean_email(self):
+		email = (self.cleaned_data.get('email'))
+		if not "edu" in email:
+			raise forms.ValidationError("Please use a valid .EDU email address")
+		return email
+9.2)
+	def clean_email(self):
+		email = (self.cleaned_data.get('email'))
+		email_base, provider = email.split("@")
+		domain, extension = provider.split(".")
+		if not domain == "bit":
+			raise forms.ValidationError("Please use a valid bit email address")
+		if not extension == "edu":
+			raise forms.ValidationError("Please use a valid .EDU email address")
+		return email
+
+	def clean_full_name(self):
+		full_name = self.cleaned_data.get('full_name')
+		return full_name
+
+10)Views and templates
+//views.py
+
+def home(request):
+	title = "Title context"
+	title1 = "Title context %s" %(request.user)
+	context = {
+	    "template_title": title,
+	    "template_title1": title1,
+	}
+	return render(request, "home.html", context)
+
+// home.html
+<h2>{{ template_title }}</h2>
+<h2>{{ template_title1 }}</h2>
+
+title = "Title context %s" %(request.user)
+
+10.1)
+title = "welcome"
+	if request.user.is_authenticated():
+		title = "Title context %s" %(request.user)
+	context = {
+	    "template_title": title,
+	}
+	return render(request, "home.html", context)
+
+11)form in view
+
+//views.py
+
+from django.shortcuts import render
+from .forms import SignUpForm
+# Create your views here.
+def home(request):
+
+	title = "welcome"
+	
+	form = SignUpForm()
+	context = {
+	    "template_title": title,
+	    "form": form,
+	}
+	return render(request, "home.html", context)
+
+//forms.html
+<form method = "POST" action="">{% csrf_token %}
+	{{ form }}
+	<input type="submit" value="Sign up"/>
+</form>
+
+11.1)
+{{ form.as_p }}   //Paragraph forms
+
+11.2)
+def home(request):
+
+	title = "welcome"	
+	if request.method == "POST":
+		print(request.POST)
+	form = SignUpForm()
+	context = {
+	    "template_title": title,
+	    "form": form,
+	}
+	return render(request, "home.html", context)
+
+// You could also do like this, make sure to comment out that 'if' statement before
+form = SignUpForm(request.POST or None)  
+if form.is_valid():
+		instance = form.save(commit = False)
+		if not instance.full_name:
+			instance.full_name = "John Doe"
+		instance.save()
+		print(instance.email)
+		print(instance.timestamp)
+
+11.3)
+	context = {
+	    "template_title": title,
+	    "form": form,
+	}
+	
+	if form.is_valid():
+		instance = form.save(commit = False)
+		if not instance.full_name:
+			instance.full_name = "John Doe"
+		instance.save()
+		context = {
+	        "template_title":"Thank you"
+	    }
+	return render(request, "home.html", context)
+
+11.4) validations can also be done in the views.py instead of forms.py
+
+if form.is_valid():
+		#print(request.POST["email"]) # not recomended
+		instance = form.save(commit = False)
+
+		full_name = form.cleaned_data.get("full_name")
+		if not full_name:
+			full_name = "New full name"
+		instance.full_name = full_name
+		instance.save()
+		context = {
+	        "template_title":"Thank you"
+	    }
+
+12) Contact form
+
+// forms.py
+class ContactForm(forms.Form):
+	full_name = forms.CharField()
+	email = forms.EmailField()
+	message = forms.CharField(widget = forms.Textarea)
+
+// views.py
+from .forms import ContactForm
+
+def contact(request):
+	form = ContactForm(request.POST or None)
+	context = {
+        "form": form
+	}
+	if form.is_valid():
+
+		for key, value in form.cleaned_data.items():
+			print(key,value)
+			#print(form.cleaned_data.get(key))
+		# full_name = form.cleaned_data.get("full_name")
+		# email = form.cleaned_data.get("email")
+		# message = form.cleaned_data.get("message")
+
+	return render(request, "contact.html", context)
+
+// urls.py
+url(r'^contact/$','contactus.views.contact', name='contact'),
+
+// templates/contact.html
+<form method = "POST" action="">{% csrf_token %}
+	{{ form.as_p }}
+	<input type="submit" value="Send request"/>
+</form>
+
+13)Sending email
+
+//Email settings in settings.py
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_HOST_USER = 'toktok420@gmail.com'
+EMAIL_HOST_PASSWORD = 'boy0boy810'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+// views.py
+
+subject = "Site contact form"
+		from_email = settings.EMAIL_HOST_USER
+		to_email = [from_email, "hemasagarm@gmail.com"]
+		contact_message = "%s: %s via %s" %(
+			contact_full_name, 
+			contact_message, 
+			contact_email)
+		print(contact_message)
+		some_html_message = """
+        <h1>Hello buddy</h1>
+        """
+		send_mail(subject, 
+			contact_message, 
+			from_email, 
+			to_email,
+			#html_message = some_html_message, 
+			fail_silently=False)
