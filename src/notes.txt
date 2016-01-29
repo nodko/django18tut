@@ -288,7 +288,7 @@ EMAIL_HOST_PASSWORD = 'boy0boy810'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-// views.py
+// contactus/views.py
 
 subject = "Site contact form"
 		from_email = settings.EMAIL_HOST_USER
@@ -307,3 +307,209 @@ subject = "Site contact form"
 			to_email,
 			#html_message = some_html_message, 
 			fail_silently=False)
+
+https://docs.djangoproject.com/en/1.9/topics/email/
+
+14) Static files
+
+//create a folder names 'static_project' and inside it add 2 folders 'static_root' and 'our_static'
+
+// Inside 'our_static' create a folder 'img'
+
+// settings.py
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static_project", "static_root")
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static_project", "our_static"),
+    #os.path.join(BASE_DIR, "static_in_env"),
+    #'/var/www/static/',
+)
+// run
+python manage.py collectstatic
+
+
+14.1) Or try this method 
+
+// Also create a folder 'static_in_env' inside the virtualenv 'django18' folder... now add that folder to sublime project
+
+// Create folder 'static_root' inside 'static_in_env'
+
+// settings.py
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env", "static_root")
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static_project", "our_static"),
+    os.path.join(BASE_DIR, "static_in_env"),
+    #'/var/www/static/',
+)
+
+// run
+python manage.py collectstatic
+
+14.2)
+//Create a folder 'media_root' inside 'static_env'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env", "media_root")
+
+15) Serving static files
+
+// urls.py
+
+from django.conf import settings
+from django.conf.urls import include, url
+from django.conf.urls.static import static
+from django.contrib import admin
+
+
+urlpatterns = [
+    # Examples:
+    url(r'^$', 'newsletter.views.home', name='home'),
+    url(r'^contact/$','contactus.views.contact', name='contact'),
+    # url(r'^blog/', include('blog.urls')),
+
+    url(r'^admin/', include(admin.site.urls)),
+] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) // use this or below using if statement
+
+if settings.DEBUG:
+	urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+16)Bootstrap
+// Go to 'http://getbootstrap.com/examples/' click on some example copy the source code
+
+// create a file 'base.html' in templates and paste the source.
+
+// Copy paste the cdn link from bootstrap in the head section or do it manually by downloading 'bootstrap' code
+
+// copy paste the 'bootstrap.min.css' file to the location '/home/toktok/programming/python_programming/trydjangotut/src/static_project/our_static/css/'
+
+// Do same for 'navbar-static-top.css'
+
+// copy paste the below code(present in django site...) on the top of 'base.html' file 
+{% load staticfiles %}
+
+// And below code in the head section
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/navbar-static-top.css' %}" rel="stylesheet">
+
+// After everything run the below command to collect all static files inside 'static_in_env'
+python manage.py collectstatic
+
+// Again repeat for the js files and image files etc
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+<link rel="icon" href="{% static 'img/favicon.ico' %}">
+
+17) Django templates
+
+// cut all the navbar div in 'base.html' and paste it in a new 'navbar.html' inside templates folder
+
+// Include the below line
+{% include 'navbar.html' %}
+
+// Optional 
+{% verbatim %}
+{% include 'navbar.html' %}
+{% endverbatim %}
+
+//commenting
+{# verbatim #}
+
+17.1) extending
+
+// cut the jumbotron div and paste it on top of 'base.html'
+
+// add the following in that place which was cut
+{% block content %}
+
+{% endblock %}
+
+// add to top of home.html
+{% extends 'base.html' %}
+
+// Enclose the form withing the {% block content %} {% endblock %}
+
+// In 'views.py'change render argument to 'home.html'
+
+17.2) block super
+//home.html
+{% block jumbotron %}
+	Hi
+	{{ block.super }}
+{% endblock %}
+
+// base.html
+{% block jumbotron %}
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h1>Navbar example</h1>
+        <p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>
+        <p>To see the difference between static and fixed top navbars, just scroll.</p>
+        <p>
+          <a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>
+        </p>
+      </div>
+
+{% endblock %}
+
+18) Bootstrap third party crispy forms
+
+pip install --upgrade django-crispy-forms
+
+INSTALLED_APPS = (
+    #django apps
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    #Third party apps
+    'crispy_forms',
+    #My apps
+    'newsletter',
+    'contactus',
+)
+
+python manage.py makemigrations
+python manage.py migrate
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+//'home.html'
+{% load crispy_forms_tags %}
+<form method = "POST" action="">{% csrf_token %}
+	{{ form|crispy }}
+	<input class="btn btn-primary" type="submit" value="Sign up"/>
+</form>
+
+18.1) home.html 
+// refer bootstrap css grid to adjust form size
+http://getbootstrap.com/css/#grid
+
+{% block content%}
+<div class="row">
+	  <div class="col-sm-6 col-md-4">
+		<h1>Hello again</h1>
+		<h2>{{ template_title }}</h2>
+		<h2>{{ template_title1 }}</h2>
+		<form method = "POST" action="">{% csrf_token %}
+			{{ form|crispy }}
+			<input class="btn btn-primary" type="submit" value="Sign up"/>
+		</form>
+	  </div>
+</div>
+
+{% endblock %}
+
+19) bootstrap grid system
+// In both 'navbar.html' and 'base.html'
+<div class="container-fluid">
+
+
+

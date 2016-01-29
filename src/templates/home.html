@@ -1,7 +1,23 @@
-<h1>Hello again</h1>
-<h2>{{ template_title }}</h2>
-<h2>{{ template_title1 }}</h2>
-<form method = "POST" action="">{% csrf_token %}
-	{{ form.as_p }}
-	<input type="submit" value="Sign up"/>
-</form>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}Welcome | {% endblock %}
+
+{% block jumbotron %}
+	{{ block.super }}
+{% endblock %}
+
+{% block content%}
+<div class="row">
+	  <div class="col-sm-6 col-md-4">
+		<h1>Hello again</h1>
+		<h2>{{ template_title }}</h2>
+		<h2>{{ template_title1 }}</h2>
+		<form method = "POST" action="">{% csrf_token %}
+			{{ form|crispy }}
+			<input class="btn btn-primary" type="submit" value="Sign up"/>
+		</form>
+	  </div>
+</div>
+
+{% endblock %}

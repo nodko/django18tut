@@ -12,6 +12,9 @@
 	[
 		{
 			"path": "src"
+		},
+		{
+			"path": "/home/toktok/programming/python_programming/.virtualenvs/django18/static_in_env"
 		}
 	]
 }
