@@ -3,21 +3,58 @@
 
 {% block head_title %}Welcome | {% endblock %}
 
+<style type="text/css">
+{% block style %}
+/*.lead {
+	text-align: center;
+}*/
+
+{% endblock %}
+</style>
+
 {% block jumbotron %}
-	{{ block.super }}
+<div class="jumbotron">
+<div class="container">
+	<div class="row">
+		<div class="col-sm-6">
+			<h1>Meet Django</h1>
+		        <p>Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of Web development, so you can focus on writing your app without needing to reinvent the wheel. It’s free and open source.</p>
+		        <p>
+		          <a class="btn btn-lg btn-primary" href="" role="button">Join Us &raquo;</a>
+		        </p>
+		</div>
+		<div class="col-sm-6" style="background-color:black;height:300px;">
+			
+		</div>
+	</div>
+</div>
+</div>
 {% endblock %}
 
 {% block content%}
 <div class="row">
-	  <div class="col-sm-6 col-md-4">
-		<h1>Hello again</h1>
-		<h2>{{ template_title }}</h2>
-		<h2>{{ template_title1 }}</h2>
+
+	  <div class="col-sm-3 pull-right">
+		<p class="lead text-align-center">{{ template_title }}</p>
 		<form method = "POST" action="">{% csrf_token %}
 			{{ form|crispy }}
 			<input class="btn btn-primary" type="submit" value="Sign up"/>
 		</form>
 	  </div>
+
+	  <div class="col-sm-3">
+		<p class="lead text-align-center">Django was designed to help developers take applications from concept to completion as quickly as possible.</p>
+	  </div>
+
+	  <div class="col-sm-3">
+		<p class="lead text-align-center">Django takes security seriously and helps developers avoid many common security mistakes.
+		</p>
+	  </div>
+
+	   <div class="col-sm-3">
+		<p class="lead text-align-center">Some of the busiest sites on the Web leverage Django’s ability to quickly and flexibly scale.</p>
+	  </div>
+	  
 </div>
 
 {% endblock %}

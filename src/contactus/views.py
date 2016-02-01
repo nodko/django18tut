@@ -5,9 +5,13 @@ from django.core.mail import send_mail
 from .forms import ContactForm
 
 def contact(request):
+	title = 'Contact Us'
+	title_align_center = True
 	form = ContactForm(request.POST or None)
 	context = {
-        "form": form
+        "form": form,
+        "title": title,
+        "title_align_center": title_align_center,
 	}
 	if form.is_valid():
 

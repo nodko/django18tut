@@ -3,7 +3,7 @@ from .forms import SignUpForm
 # Create your views here.
 def home(request):
 
-	title = "welcome"
+	title = "Welcome"
 	
 	# if request.user.is_authenticated():
 	# 	title = "Title context %s" %(request.user)
@@ -30,4 +30,4 @@ def home(request):
 		context = {
 	        "template_title":"Thank you"
 	    }
-	return render(request, "example_fluid.html", context)
+	return render(request, "home.html", context)

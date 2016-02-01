@@ -511,5 +511,105 @@ http://getbootstrap.com/css/#grid
 // In both 'navbar.html' and 'base.html'
 <div class="container-fluid">
 
+20)create a aboutus view
+
+// in trydjango18 folder create a 'views.py'
+from django.shortcuts import render
+# Create your views here.
+def about(request):
+	return render(request, "about.html", {})
+
+//urls.py
+url(r'^about/$','trydjango18.views.about', name='about'),
+
+//In 'navbar.html' doing urlnames as links.
+<li><a href="{% url "about" %}">About</a></li>
+
+21) contact page styling
+//contact.html
+
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div>
+	<form method = "POST" action="">{% csrf_token %}
+		{{form|crispy}}
+		<input class="btn btn-primary" type="submit" value="Send request"/>
+	</form>
+</div>
+{% endblock %}
+
+//custom title for 'contact.html'
+{% block content %}
+
+<div class="row">
+	<div class="col-sm-6 col-sm-offset-3">
+		{% if title %}
+			<h1 class="text-align-center">{{ title }}</h1>
+		{% endif %}
+		<form method = "POST" action="">{% csrf_token %}
+			{{form|crispy}}
+			<input class="btn btn-default" type="submit" value="Send request"/>
+		</form>
+	</div>
+</div>
+{% endblock %}
+
+21.1) We can also use the 'if' statements inside div class
+
+//'contact.html'
+
+<div class="col-sm-6 col-sm-offset-3">
+<h1 class="{% if title_align_center %}text-align-center{% endif %}">{{ title }}</h1>
 
 
+22) Django registration redux
+
+pip install django-registration-redux
+
+// settings.py
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_AUTO_LOGIN = True
+
+python manage.py migrate
+
+22.1) settings.py
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'  // to redirect site after user login
+
+23)Aunthentication link
+
+//navbar.html
+<ul class="nav navbar-nav navbar-right">
+          {% if request.user.is_authenticated %}
+            <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'auth_login' %}">Login</a></li>
+            <li><a href="{% url 'registration_register' %}">Register</a></li>
+            {% endif %}
+          </ul>
+</ul>
+
+23.1)
+<ul class="nav navbar-nav navbar-right">
+          {% if request.user.is_authenticated %}
+            <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'registration_register' %}">Register</a></li>
+            {% endif %}
+          </ul>
+
+          {% if not request.user.is_authenticated and not "/accounts/login" in request.get_full_path %}
+          <form class="navbar-form navbar-right" method="POST" action="{% url 'auth_login' %}">{% csrf_token %}
+            <div class="form-group">
+              <input type="text" class="form-control" name="username" placeholder="username"/>
+            </div>
+            <div class="form-group">
+               <input type="password" class="form-control" name="password" placeholder="password"/>
+            </div>
+            <button type="submit" class="btn btn-default">Login</button>
+          </form>
+          {% endif %}
+
+24)

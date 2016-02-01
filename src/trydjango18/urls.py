@@ -8,6 +8,8 @@ urlpatterns = [
     # Examples:
     url(r'^$', 'newsletter.views.home', name='home'),
     url(r'^contact/$','contactus.views.contact', name='contact'),
+    url(r'^about/$','trydjango18.views.about', name='about'),
+    url(r'^accounts/', include('registration.backends.default.urls')),
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
