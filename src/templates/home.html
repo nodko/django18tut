@@ -14,6 +14,7 @@
 </style>
 
 {% block jumbotron %}
+{% if not request.user.is_authenticated %}
 <div class="jumbotron">
 <div class="container">
 	<div class="row">
@@ -31,11 +32,36 @@
 	</div>
 </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block content%}
+{% if request.user.is_authenticated %}
+	<h1>You are logged in</h1>
+	{% if queryset %}
+		<h2>Welcome staff</h2>
+		<table class="table table-striped table-bordered">
+		<tr>
+			<th>#</th>
+			<th>Email</th>
+			<th>Fullname</th>
+			<th>Timestamp</th>
+		</tr>
+		{% for instances in queryset %}
+			<tr>
+				<td>{{ forloop.counter }}</td>
+				<td>{{ instances }}</td>
+				<td>{{instances.full_name}}</td>
+				<td>{{instances.timestamp|timesince}} ago</td>
+			</tr>
+			<br/>
+		{% endfor %}
+		</table>
+		<br/>
+		{{ queryset }}
+	{% endif %}
+{% else %}
 <div class="row">
-
 	  <div class="col-sm-3 pull-right">
 		<p class="lead text-align-center">{{ template_title }}</p>
 		<form method = "POST" action="">{% csrf_token %}
@@ -58,14 +84,13 @@
 
 	   <div class="col-sm-3">
 		<p class="lead text-align-center">Some of the busiest sites on the Web leverage Django’s ability to quickly and flexibly scale.<br/>
-		<i class="fa fa-cog fa-spin fa-3x"></i>	
+		<i class="fa fa-cog fa-3x"></i>	
 		</p>
-		<span class="fa-stack fa-lg">
+		<!-- <span class="fa-stack fa-lg">
   			<i class="fa fa-circle fa-stack-2x"></i>
   			<i class="fa fa-flag fa-stack-1x fa-inverse"></i>
-		</span>
+		</span> -->
 	  </div>
-	  
 </div>
-
+{% endif %}
 {% endblock %}

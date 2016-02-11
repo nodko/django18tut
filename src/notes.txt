@@ -613,3 +613,78 @@ LOGIN_REDIRECT_URL = '/'  // to redirect site after user login
           {% endif %}
 
 24)
+
+//navbar-static-top.css
+body {
+  min-height: 1000px;
+}
+
+//Create an about.html template to display the about me page
+
+//In the 'home.html'
+{% block content%}
+{% if request.user.is_authenticated %}
+	<h1>You are logged in</h1>
+{% else %}
+{% endif %}
+
+24.1)
+//views.py
+if request.user.is_authenticated() and request.user.is_staff:
+		context = {
+		    "queryset": [123, 456]
+		}
+
+//home.html
+{% block content%}
+{% if request.user.is_authenticated %}
+	<h1>You are logged in</h1>
+	{{ queryset }}
+
+25) Querysets
+//views.py
+if request.user.is_authenticated() and request.user.is_staff:
+		# print(SignUp.objects.all())
+		# i = 1
+		# for instances in SignUp.objects.all():
+		# 	print(i)
+		# 	print(instances.full_name)
+		# 	i += 1
+		# queryset = SignUp.objects.all().order_by('-timestamp')
+		queryset = SignUp.objects.all().order_by('-timestamp').filter(full_name__icontains="sagar")
+		# print(SignUp.objects.all().order_by('-timestamp').filter(full_name__icontains="sagar").count())
+		context = {
+		    "queryset": queryset
+		}
+
+//home.html
+{% block content%}
+{% if request.user.is_authenticated %}
+	<h1>You are logged in</h1>
+	{% if queryset %}
+		<h2>Welcome staff</h2>
+		<table class="table table-striped table-bordered">
+		<tr>
+			<th>#</th>
+			<th>Email</th>
+			<th>Fullname</th>
+			<th>Timestamp</th>
+		</tr>
+		{% for instances in queryset %}
+			<tr>
+				<td>{{ forloop.counter }}</td>
+				<td>{{ instances }}</td>
+				<td>{{instances.full_name}}</td>
+				<td>{{instances.timestamp|timesince}} ago</td>
+			</tr>
+			<br/>
+		{% endfor %}
+		</table>
+		<br/>
+		{{ queryset }}
+	{% endif %}
+{% endif %}
+{% endblock %}
+
+26)Settings for different environment
+
